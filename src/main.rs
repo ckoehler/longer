@@ -3,14 +3,22 @@ use chrono::NaiveDate;
 use clap::Parser;
 use prettytable::{row, Table};
 
-/// Tool to handle discussion guides
+/// Tells you when you have been _____ longer than not.
+///
+/// Have you ever wondered when you will have been married longer than not? Or lived in a certain
+/// place longer than not? Or had a college degree longer than not? Or liked guacamole longer than
+/// not?
+///
+/// Tough to calculate manually, but easy with Longer! Just enter the start date (like your
+/// birthday), the day of the Event you're wondering about (like your wedding day, move date,
+/// graduation, or the revelation that guacamole is awesome), and Longer will do the job for you!
 #[derive(Parser, Debug)]
 #[clap(version, author = "Christoph Koehler")]
 struct Opts {
-    /// The Start date, e.g. your birthday
+    /// The start date, e.g. your birthday ("yyyy-mm-dd")
     #[arg(short, long)]
     start: String,
-    /// The event to count as the midpoint
+    /// The event to count as the midpoint, e.g. your wedding date ("yyyy-mm-dd")
     #[arg(short, long)]
     event: String,
 }
