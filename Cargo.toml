@@ -1,0 +1,16 @@
+[package]
+name = "longer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4", features = ["derive", "suggestions", "color"] }
+chrono = "0.4"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"]}
+thiserror = "1.0.40"
+date_time_parser = "0.2.0"
+prettytable-rs = "0.10.0"
+
