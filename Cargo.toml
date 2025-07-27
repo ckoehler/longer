@@ -16,3 +16,10 @@ assert_cmd = "2.0"
 predicates = "3.0"
 insta = "1.34"
 
+[package.metadata.release]
+# Don't publish to crates.io automatically (we'll do that via GitHub Actions)
+publish = false
+# Custom tag message
+tag-message = "Release {{version}}"
+cargo-release = "0.25"
+
