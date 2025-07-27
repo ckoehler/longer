@@ -11,7 +11,7 @@ env:
 
 jobs:
   clippy:
-    name: Test
+    name: clippy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
       run: cargo clippy -- -D warnings
 
   test:
-    name: Test
+    name: test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -33,14 +33,14 @@ jobs:
       run: cargo nextest run --release
 
   deny:
-    name: Cargo Deny
+    name: deny
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: EmbarkStudios/cargo-deny-action@v2
 
   fmt:
-    name: Rustfmt
+    name: fmt
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
