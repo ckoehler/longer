@@ -21,4 +21,7 @@ insta = "1.34"
 publish = false
 # Custom tag message
 tag-message = "Release {{version}}"
+# Run git-cliff to update changelog before release
+pre-release-hook = ["git", "cliff", "--workdir", "./", "-o", "CHANGELOG.md", "--tag", "{{version}}" ]
+
 

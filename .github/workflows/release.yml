@@ -77,13 +77,18 @@ jobs:
       - name: List downloaded artifacts
         run: ls -al release-artifacts
 
+      - name: Generate release notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          body: |
-            ## What's Changed
-            
-            See the full changelog for details.
+          body_path: RELEASE_NOTES.md
           files: |
             release-artifacts/**/*
           draft: false
