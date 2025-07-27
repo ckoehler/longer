@@ -9,41 +9,23 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
-
   build:
-    name: Build and Upload
-    needs: create-release
+    name: Build ${{ matrix.target }}
     strategy:
       matrix:
         include:
         - os: ubuntu-latest
           target: x86_64-unknown-linux-gnu
-          asset_name: longer-linux-x86_64
+          name: longer-linux-x86_64
         - os: windows-latest
           target: x86_64-pc-windows-msvc
-          asset_name: longer-windows-x86_64.exe
-        - os: macos-latest
+          name: longer-windows-x86_64.exe
+        - os: macos-13
           target: x86_64-apple-darwin
-          asset_name: longer-macos-x86_64
+          name: longer-macos-x86_64
         - os: macos-latest
           target: aarch64-apple-darwin
-          asset_name: longer-macos-aarch64
+          name: longer-macos-aarch64
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -56,30 +38,59 @@ jobs:
     - name: Build
       run: cargo build --release --target ${{ matrix.target }}
     
-    - name: Prepare asset (Unix)
+    - name: Prepare binary (Unix)
       if: matrix.os != 'windows-latest'
       run: |
-        cp target/${{ matrix.target }}/release/longer ${{ matrix.asset_name }}
+        cp target/${{ matrix.target }}/release/longer ${{ matrix.name }}
         
-    - name: Prepare asset (Windows)
+    - name: Prepare binary (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        copy target\${{ matrix.target }}\release\longer.exe ${{ matrix.asset_name }}
+        copy target\${{ matrix.target }}\release\longer.exe ${{ matrix.name }}
     
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        upload_url: ${{ needs.create-release.outputs.upload_url }}
-        asset_path: ./${{ matrix.asset_name }}
-        asset_name: ${{ matrix.asset_name }}
-        asset_content_type: application/octet-stream
+        name: ${{ matrix.name }}
+        path: ${{ matrix.name }}
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: List downloaded artifacts
+        run: ls -al release-artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: |
+            ## What's Changed
+            
+            See the full changelog for details.
+          files: |
+            release-artifacts/**/*
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-crates:
     name: Publish to crates.io
     runs-on: ubuntu-latest
-    needs: build
+    needs: release
     steps:
     - uses: actions/checkout@v4
     - uses: dtolnay/rust-toolchain@stable
