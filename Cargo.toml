@@ -21,5 +21,4 @@ insta = "1.34"
 publish = false
 # Custom tag message
 tag-message = "Release {{version}}"
-cargo-release = "0.25"
 
