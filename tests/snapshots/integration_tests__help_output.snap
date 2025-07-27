@@ -1,0 +1,31 @@
+---
+source: tests/integration_tests.rs
+expression: "String::from_utf8_lossy(&output.stdout)"
+---
+Have you ever wondered when you will have been married longer than not? This tool calculates that date for you!
+
+Usage: longer --start <YYYY-MM-DD> --event <YYYY-MM-DD>
+
+Options:
+  -s, --start <YYYY-MM-DD>
+          The start date, e.g. your birthday
+          
+          Format: YYYY-MM-DD (e.g., 1990-05-15)
+
+  -e, --event <YYYY-MM-DD>
+          The event to count as the midpoint, e.g. your wedding date
+          
+          Format: YYYY-MM-DD (e.g., 2015-08-20)
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+
+EXAMPLES:
+  longer --start 1990-05-15 --event 2015-08-20
+  longer -s 1985-01-01 -e 2010-06-15
+
+DATE FORMAT:
+  All dates must be in YYYY-MM-DD format (ISO 8601)

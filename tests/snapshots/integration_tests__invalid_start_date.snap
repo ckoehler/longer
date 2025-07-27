@@ -1,0 +1,7 @@
+---
+source: tests/integration_tests.rs
+expression: "String::from_utf8_lossy(&output.stderr)"
+---
+thread 'main' panicked at src/main.rs:33:10:
+Invalid start date format (use yyyy-mm-dd): ParseError(Invalid)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
