@@ -1,25 +1,26 @@
 use chrono::Duration;
 use chrono::NaiveDate;
 use clap::Parser;
-use prettytable::{row, Table};
+use prettytable::{Table, row};
 
-/// Tells you when you have been _____ longer than not.
-///
-/// Have you ever wondered when you will have been married longer than not? Or lived in a certain
-/// place longer than not? Or had a college degree longer than not? Or liked guacamole longer than
-/// not?
-///
-/// Tough to calculate manually, but easy with Longer! Just enter the start date (like your
-/// birthday), the day of the Event you're wondering about (like your wedding day, move date,
-/// graduation, or the revelation that guacamole is awesome), and Longer will do the job for you!
 #[derive(Parser, Debug)]
-#[clap(version, author = "Christoph Koehler")]
+#[clap(
+    version,
+    author = "Christoph Koehler",
+    about = "Calculate when you've done something longer than not",
+    long_about = "Have you ever wondered when you will have been married longer than not? This tool calculates that date for you!",
+    after_help = "EXAMPLES:\n  longer --start 1990-05-15 --event 2015-08-20\n  longer -s 1985-01-01 -e 2010-06-15\n\nDATE FORMAT:\n  All dates must be in YYYY-MM-DD format (ISO 8601)"
+)]
 struct Opts {
-    /// The start date, e.g. your birthday ("yyyy-mm-dd")
-    #[arg(short, long)]
+    /// The start date, e.g. your birthday
+    ///
+    /// Format: YYYY-MM-DD (e.g., 1990-05-15)
+    #[arg(short, long, value_name = "YYYY-MM-DD")]
     start: String,
-    /// The event to count as the midpoint, e.g. your wedding date ("yyyy-mm-dd")
-    #[arg(short, long)]
+    /// The event to count as the midpoint, e.g. your wedding date
+    ///
+    /// Format: YYYY-MM-DD (e.g., 2015-08-20)
+    #[arg(short, long, value_name = "YYYY-MM-DD")]
     event: String,
 }
 
@@ -27,23 +28,17 @@ fn main() {
     // parse command line options
     let opts: Opts = Opts::parse();
 
-    // parse start date into year, month, day Vec
-    let start: Vec<u32> = opts
-        .start
-        .split('-')
-        .map(|s| s.parse::<u32>().unwrap())
-        .collect();
+    // parse dates using chrono's built-in parsing
+    let dt = NaiveDate::parse_from_str(&opts.start, "%Y-%m-%d")
+        .expect("Invalid start date format (use yyyy-mm-dd)");
+    let mid = NaiveDate::parse_from_str(&opts.event, "%Y-%m-%d")
+        .expect("Invalid event date format (use yyyy-mm-dd)");
 
-    // parse event date into year, month, day Vec
-    let mid: Vec<u32> = opts
-        .event
-        .split('-')
-        .map(|s| s.parse::<u32>().unwrap())
-        .collect();
-
-    // now parse those into NaiveDates
-    let dt = NaiveDate::from_ymd_opt(start[0].try_into().unwrap(), start[1], start[2]).unwrap();
-    let mid = NaiveDate::from_ymd_opt(mid[0].try_into().unwrap(), mid[1], mid[2]).unwrap();
+    // validate that event date comes after start date
+    if mid <= dt {
+        eprintln!("Error: Event date must be after start date");
+        std::process::exit(1);
+    }
 
     // grab the duration between Start and Event
     let diff = mid - dt;
