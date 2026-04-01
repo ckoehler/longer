@@ -42,7 +42,9 @@ fn test_invalid_start_date() {
         .unwrap();
 
     assert!(!output.status.success());
-    insta::assert_snapshot!(String::from_utf8_lossy(&output.stderr));
+    insta::with_settings!({filters => vec![(r"thread 'main' \(\d+\)", "thread 'main' (PID)")]}, {
+        insta::assert_snapshot!(String::from_utf8_lossy(&output.stderr));
+    });
 }
 
 #[test]
@@ -57,7 +59,9 @@ fn test_invalid_event_date() {
         .unwrap();
 
     assert!(!output.status.success());
-    insta::assert_snapshot!(String::from_utf8_lossy(&output.stderr));
+    insta::with_settings!({filters => vec![(r"thread 'main' \(\d+\)", "thread 'main' (PID)")]}, {
+        insta::assert_snapshot!(String::from_utf8_lossy(&output.stderr));
+    });
 }
 
 #[test]
